@@ -22,6 +22,20 @@ nxjflash
 
 Using the API documentation [click here](https://lejos.sourceforge.io/nxt/nxj/api/index.html) and other sources like this [tutorial](http://www.lejos.org/nxt/nxj/tutorial/).
 
+## Step 3: Deferences Programmes
+
+### HelloWorld.java
+
+A programme that display Hello World.
+
+### WalkingRobot.java
+
+A program that make a robot walk depend on pressed button. Using a classes :
+	[LCD](http://www.lejos.org/nxt/nxj/api/lejos/nxt/LCD.html), 
+	[Button](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Button.html), 
+	[Motor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Motor.html), 
+	[Delay](http://www.lejos.org/nxt/nxj/api/lejos/util/Delay.html).
+
 
 
 
