@@ -1,0 +1,6 @@
+13/10/2017 Alex
+Fait: 
+- Hello World 
+- Robot monté
+A faire:
+- Le robot bouger
