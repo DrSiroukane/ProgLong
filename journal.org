@@ -4,3 +4,9 @@ Fait:
 - Robot monté
 A faire:
 - Le robot bouger
+
+27/10/2017 Alex
+* Fait:
+- Le robot bouge
+* A faire:
+- Aprentissage et reconaissance de couleurs
