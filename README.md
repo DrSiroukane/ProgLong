@@ -36,8 +36,12 @@ A program that make a robot walk depend on pressed button. Using a classes :
 	[Motor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Motor.html), 
 	[Delay](http://www.lejos.org/nxt/nxj/api/lejos/util/Delay.html).
 
+### WalkingRobot2.java
 
-
+A program that make a robot walk depend on pressed button. Using a classes :
+	[LCD](http://www.lejos.org/nxt/nxj/api/lejos/nxt/LCD.html), 
+	[Button](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Button.html), 
+	[Motor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Motor.html).
 
 ## Created by
 
