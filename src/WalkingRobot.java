@@ -8,7 +8,7 @@ import lejos.util.Delay;
  * @author Slimane SIROUKANE
  * @author Thomas GUIGNARD
  *
- * A program that make a robot walk depend on pressed button
+ * A program that makes a robot walk depend on pressed button
  *
  */
 public class WalkingRobot {
