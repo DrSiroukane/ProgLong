@@ -17,3 +17,10 @@ A faire:
 * A faire:
 - Faire suivre la ligne
 
+24/11/2017 Alex
+* Fait:
+  - Faire suivre une ligne droite
+* A faire:
+  - Suivre une ligne courbe (des virages)
+
+
