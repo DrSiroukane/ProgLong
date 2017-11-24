@@ -63,6 +63,16 @@ else try to find which stocked color is the closest using the median.
 	[ColorSensor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/ColorSensor.html),
 	[Color](http://www.lejos.org/nxt/pc/api/lejos/robotics/Color.html).
 
+### ColorDetector3.java
+
+### CLineFollower.java
+
+A program that makes a robot follow specified line by its color,
+	[ColorDetector3](),
+	[DifferentialPilot](https://lejos.sourceforge.io/nxt/nxj/api/lejos/robotics/navigation/DifferentialPilot.html),
+	and other classes.
+
+
 ## Created by
 
 * Thomas GUIGNARD
