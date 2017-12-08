@@ -30,7 +30,7 @@ public class ColorDetector3 {
 		this.nbr_colors = nbr_colors;
 		list_colors = new int[nbr_colors][3];
 		this.cs = cs;
-		error_avg = 30;
+		error_avg = 45;
 	}
 
 	/**
@@ -106,6 +106,26 @@ public class ColorDetector3 {
 	 */
 	public boolean testColor(Color c, int color_number){
 		return (minDistance3D(c,color_number) < error_avg);
+	}
+	
+	/**
+	 * Method to detect closest color
+	 * @param c
+	 * @return
+	 */
+	public int getColorIndex(Color c){
+		int detected_color = 0;
+		float min = minDistance3D(c,0);
+		float d;
+		for(int i=1; i<nbr_colors; i++){
+			d = minDistance3D(c,i);
+			if(d < min){
+				min = d;
+				detected_color = i;
+			}
+		}
+		
+		return detected_color;
 	}
 	
 	
