@@ -65,12 +65,26 @@ else try to find which stocked color is the closest using the median.
 
 ### ColorDetector3.java
 
+A program that makes a robot learn about colors then detect them, 
+using color (RGB) to find which stocked color is the closest to color median.
+
+### ColorDetector4.java
+
+A program that makes a robot learn about colors then detect them, 
+using min and max for each color (RGB) if detected color inside the interval
+else try to find which stocked color is the closest using the median,
+else try to find if its cloest to min and max using distance 
+
 ### CLineFollower.java
 
 A program that makes a robot follow specified line by its color,
 	[ColorDetector3](),
 	[DifferentialPilot](https://lejos.sourceforge.io/nxt/nxj/api/lejos/robotics/navigation/DifferentialPilot.html),
 	and other classes.
+
+### CRoadFollower.java
+
+### CRoadFollower2.java
 
 
 ## Created by
