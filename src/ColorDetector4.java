@@ -167,6 +167,7 @@ public class ColorDetector4 {
 	 * @return     check weather the color can be the same of color_number
 	 */
 	public boolean testColor(Color c, int color_number){
+//		System.out.print(minDistance3D(c, color_number, MED));
 		return (
 				(testColorMinMax(c, color_number)) ||
 				(minDistance3D(c, color_number, MED) < error_avg) || 
