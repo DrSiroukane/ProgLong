@@ -33,3 +33,9 @@ A faire:
 ** À faire:
 - ameliorer l'algo. 
 - essayer un algo PID
+
+* <15-12-2017>
+** Fait: 
+- un robot qui marche en general mais parfois il perd la ligne
+** À faire:
+- ameliorer l'algo. 
