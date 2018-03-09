@@ -27,21 +27,23 @@ A faire:
 
 
 
-* <15-12-2017>
+* <15-12-2018>
 ** Fait: 
 - un robot qui marche trop lentement
 ** À faire:
 - ameliorer l'algo. 
 - essayer un algo PID
 
-* <02-02-2017>
+* <02-02-2018>
 ** Fait: 
 - un robot qui marche en general mais parfois il perd la ligne
 ** À faire:
 - ameliorer l'algo. 
 
-* <16-02-2017>
+* <09-03-2018>
 ** Fait: 
-- un robot qui suit le bord de la ligne
+- le robot marche bien mais parfois il bug pendant les virages et carrefours
 ** À faire:
-- ameliorer l'algorithme pour suivre les deux bords de la ligne
+  - Utiliser plusieurs capteurs pour resoudre des problemes causés par le
+    carrefour
+  - Si ça ne marche pas, essayer d'ameliorer l'algo avec un seul capteur
