@@ -42,8 +42,9 @@ A faire:
 
 * <09-03-2018>
 ** Fait: 
-- le robot marche bien mais parfois il bug pendant les virages et carrefours
-** À faire:
   - Utiliser plusieurs capteurs pour resoudre des problemes causés par le
     carrefour
-  - Si ça ne marche pas, essayer d'ameliorer l'algo avec un seul capteur
+** À faire:
+  - Essayer de faire deux ensembles de parameters, un pour les couleur plus
+    claire et l'autre pous les couleurs plus foncés
+  - Essayer de faire un demi-tour
