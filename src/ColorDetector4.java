@@ -1,6 +1,7 @@
 import lejos.nxt.Button;
 import lejos.nxt.ColorSensor;
 import lejos.nxt.LCD;
+import lejos.nxt.SensorPort;
 import lejos.robotics.Color;
 import lejos.util.Delay;
 
@@ -26,10 +27,19 @@ public class ColorDetector4 {
 	final static int MAX = 1;
 	final static int MED = 2;
 	
+	final static int FORWARD_COLOR = 0;
+	final static int SPACE_COLOR = 1;
+	final static int ROTATE_COLOR = 2;
+	
 	public int nbr_colors;
 	public int[][][] list_colors;
 	public ColorSensor cs;
 	public int error_avg;
+	
+	public int nbr_tries = 51;
+	public int[][] color_data = new int[3][nbr_tries];
+	public Color in_color;
+	public int current_red, current_blue, current_green;
 
 	public ColorDetector4(int nbr_colors, ColorSensor cs){
 		this.nbr_colors = nbr_colors;
@@ -40,70 +50,75 @@ public class ColorDetector4 {
 				list_colors[i][MED][j] = 0;
 				list_colors[i][MAX][j] = 0;
 			}
-			
 		}
 		
 		this.cs = cs;
-		error_avg = 45;
+		error_avg = 40;
 	}
+	
+	/**
+	 * Method that stock red, blue and green value of each color focusing on median value
+	 */
+	public void stockColor(int i){
+//		displayFull("ColorDetector Stocking color number "+ i);
+//		Button.waitForAnyPress();
+		
+		for(int j=0; j<nbr_tries; j++){
+			in_color = cs.getColor();
+			current_red = in_color.getRed();
+			current_blue = in_color.getBlue();
+			current_green = in_color.getGreen();
+			
+			if(current_red < list_colors[i][MIN][RED]){
+				list_colors[i][MIN][RED] = current_red;
+			}else if(list_colors[i][MAX][RED] < current_red){
+				list_colors[i][MAX][RED] = current_red;
+			}
+			
+			if(current_blue < list_colors[i][MIN][BLUE]){
+				list_colors[i][MIN][BLUE] = current_blue;
+			}else if(list_colors[i][MAX][BLUE] < current_blue){
+				list_colors[i][MAX][BLUE] = current_blue;
+			}
+			
+			if(current_green < list_colors[i][MIN][GREEN]){
+				list_colors[i][MIN][GREEN] = current_green;
+			}else if(list_colors[i][MAX][GREEN] < current_green){
+				list_colors[i][MAX][GREEN] = current_green;
+			}
 
+			color_data[RED][j] = current_red;
+			color_data[BLUE][j] = current_blue;
+			color_data[GREEN][j] = current_green;
+
+//			Delay.msDelay(50);
+		}
+
+		Arrays.sort(color_data[RED]);
+		Arrays.sort(color_data[BLUE]);
+		Arrays.sort(color_data[GREEN]);
+
+		int med_index = (nbr_tries - 1) / 2;
+		
+		list_colors[i][MED][RED] = color_data[RED][med_index];
+		list_colors[i][MED][BLUE] = color_data[BLUE][med_index];
+		list_colors[i][MED][GREEN] = color_data[GREEN][med_index];
+
+//		displayFull("MAX - MIN\n R=["+list_colors[i][MIN][RED]+","+list_colors[i][MAX][RED]+"]\n B=["+list_colors[i][MIN][BLUE]+","+list_colors[i][MAX][BLUE]+"]\n G=["+list_colors[i][MIN][GREEN]+","+list_colors[i][MAX][GREEN]);
+//		Button.waitForAnyPress();
+		
+		displayFull("MED\n R=["+list_colors[i][MED][RED]+"]\n B=["+list_colors[i][MED][BLUE]+"]\n G=["+list_colors[i][MED][GREEN]+"]\nPress any button to continue ...");
+		Button.waitForAnyPress();
+	}
+	
 	/**
 	 * Method that stock red, blue and green value of each color focusing on median value
 	 */
 	public void createMedOfColors(){
-		int nbr_tries = 51;
-		int[][] color_data = new int[3][nbr_tries];
-		Color in_color;
-		int current_red, current_blue, current_green;
 		Button.waitForAnyPress();
 		for(int i=0; i<nbr_colors; i++){
-			displayFull("Start stocking\nColor number "+i);
-			for(int j=0; j<nbr_tries; j++){
-				in_color = cs.getColor();
-				current_red = in_color.getRed();
-				current_blue = in_color.getBlue();
-				current_green = in_color.getGreen();
-				
-				if(current_red < list_colors[i][MIN][RED]){
-					list_colors[i][MIN][RED] = current_red;
-				}else if(list_colors[i][MAX][RED] < current_red){
-					list_colors[i][MAX][RED] = current_red;
-				}
-				
-				if(current_blue < list_colors[i][MIN][BLUE]){
-					list_colors[i][MIN][BLUE] = current_blue;
-				}else if(list_colors[i][MAX][BLUE] < current_blue){
-					list_colors[i][MAX][BLUE] = current_blue;
-				}
-				
-				if(current_green < list_colors[i][MIN][GREEN]){
-					list_colors[i][MIN][GREEN] = current_green;
-				}else if(list_colors[i][MAX][GREEN] < current_green){
-					list_colors[i][MAX][GREEN] = current_green;
-				}
-
-				color_data[RED][j] = current_red;
-				color_data[BLUE][j] = current_blue;
-				color_data[GREEN][j] = current_green;
-
-				Delay.msDelay(50);
-			}
-
-			Arrays.sort(color_data[RED]);
-			Arrays.sort(color_data[BLUE]);
-			Arrays.sort(color_data[GREEN]);
-
-			int med_index = (nbr_tries - 1) / 2;
-			
-			list_colors[i][MED][RED] = color_data[RED][med_index];
-			list_colors[i][MED][BLUE] = color_data[BLUE][med_index];
-			list_colors[i][MED][GREEN] = color_data[GREEN][med_index];
-
-			displayFull("MAX - MIN\n R=["+list_colors[i][MIN][RED]+","+list_colors[i][MAX][RED]+"]\n B=["+list_colors[i][MIN][BLUE]+","+list_colors[i][MAX][BLUE]+"]\n G=["+list_colors[i][MIN][GREEN]+","+list_colors[i][MAX][GREEN]);
-			Button.waitForAnyPress();
-			
-			displayFull("MED\n R=["+list_colors[i][MED][RED]+"]\n B=["+list_colors[i][MED][BLUE]+"]\n G=["+list_colors[i][MED][GREEN]+"]\nPress any button to stock next color ...");
-			Button.waitForAnyPress();
+			displayFull("Start stocking\nColor number " + i);
+			stockColor(i);
 		}
 	}
 	
@@ -167,7 +182,9 @@ public class ColorDetector4 {
 	 * @return     check weather the color can be the same of color_number
 	 */
 	public boolean testColor(Color c, int color_number){
-//		System.out.print(minDistance3D(c, color_number, MED));
+		System.out.println("color_number: " + color_number);
+		System.out.println("d(MinMax):" + minDistance3D(c, color_number, MIN));
+		System.out.println("d(Med):" + minDistance3D(c, color_number, MED));
 		return (
 				(testColorMinMax(c, color_number)) ||
 				(minDistance3D(c, color_number, MED) < error_avg) || 
@@ -195,6 +212,59 @@ public class ColorDetector4 {
 		return false;
 	}
 	
+	public int getCurrentColor(Color c){
+		double min_dist_3d = 500;
+		double current_dist = 0;
+		int[][] color_detected = {
+				{0, 0, 0}, // FORWARD_COLOR
+				{0, 0, 0}, // SPACE_COLOR
+				{0, 0, 0} // ROTATE_COLOR
+		};
+		
+		for(int i=0; i<nbr_colors; i++){
+			current_dist = minDistance3D(c, i, MIN);
+			if(min_dist_3d < current_dist){
+				min_dist_3d = current_dist;
+				color_detected[i][0] = 1;
+			}
+		}
+		
+		for(int i=0; i<nbr_colors; i++){
+			current_dist = minDistance3D(c, i, MED);
+			if(min_dist_3d < current_dist){
+				min_dist_3d = current_dist;
+				color_detected[i][1] = 1;
+			}
+		}
+		
+		for(int i=0; i<nbr_colors; i++){
+			color_detected[i][2] = testColorMinMax(c, i) ? 1 : 0;
+		}
+		
+		
+		for(int i=0; i<color_detected.length; i++){
+			System.out.print("color " + i + " ");
+			for(int j=0; j<color_detected[0].length; j++){
+				System.out.print(color_detected[i][j] + " - ");
+			}
+			System.out.println();
+		}
+		
+		/*if(testColor(c, FORWARD_COLOR)){
+			return FORWARD_COLOR;
+		}
+		
+		if(testColor(c, SPACE_COLOR)){
+			return SPACE_COLOR;
+		}
+		
+		if(testColor(c, ROTATE_COLOR)){
+			return ROTATE_COLOR;
+		}*/
+		
+		return SPACE_COLOR;
+	}
+	
 	/**
 	 * Method to detect closest color
 	 * @param c
@@ -215,7 +285,6 @@ public class ColorDetector4 {
 		return detected_color;
 	}
 	
-	
 	/**
 	 * Display only the phrase on screen
 	 * 
@@ -233,5 +302,39 @@ public class ColorDetector4 {
 	 */
 	public static void println(String phrase){
 		System.out.println(phrase);
+	}
+
+	public static void main(String[] args) {
+		int nbr_color = 3;
+		ColorSensor colorSensor = new ColorSensor(SensorPort.S2);
+		ColorDetector4 colorDetector = new ColorDetector4(nbr_color, colorSensor);
+		
+		System.out.println("Stock color using Color Sensor detector");
+		Button.waitForAnyPress();
+		LCD.clear();
+		
+		for(int i=0; i<3; i++){
+			System.out.println("Get ready to stock color n " + i);
+			Button.waitForAnyPress();
+			LCD.clear();
+			
+			colorDetector.stockColor(i);
+			Button.waitForAnyPress();
+			LCD.clear();
+		}
+		
+		System.out.println("Start testing");
+		Button.waitForAnyPress();
+		LCD.clear();
+		
+		int current_color = 0;
+		do{
+			current_color = colorDetector.getCurrentColor(colorSensor.getColor());
+			Button.waitForAnyPress();
+			LCD.clear();
+			System.out.println("Current color detected " + current_color);
+			Button.waitForAnyPress();
+			LCD.clear();
+		}while(!Button.ESCAPE.isDown());
 	}
 }

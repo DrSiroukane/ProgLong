@@ -27,10 +27,19 @@ public class ColorHTDetector {
 	final static int MAX = 1;
 	final static int MED = 2;
 	
+	final static int FORWARD_COLOR = 0;
+	final static int SPACE_COLOR = 1;
+	final static int ROTATE_COLOR = 2;
+	
 	public int nbr_colors;
 	public int[][][] list_colors;
 	public ColorHTSensor cs;
 	public int error_avg;
+	
+	public int nbr_tries = 31;
+	public int[][] color_data = new int[3][nbr_tries];
+	public Color in_color;
+	public int current_red, current_blue, current_green;
 
 	public ColorHTDetector(int nbr_colors, ColorHTSensor cs){
 		this.nbr_colors = nbr_colors;
@@ -45,66 +54,72 @@ public class ColorHTDetector {
 		}
 		
 		this.cs = cs;
-		error_avg = 30;
+		error_avg = 25;
 	}
 
 	/**
 	 * Method that stock red, blue and green value of each color focusing on median value
 	 */
+	public void stockColor(int i){
+//		displayFull("ColorHTDetector Stocking color number "+ i);
+//		Button.waitForAnyPress();
+		
+		for(int j=0; j<nbr_tries; j++){
+			in_color = cs.getColor();
+			current_red = in_color.getRed();
+			current_blue = in_color.getBlue();
+			current_green = in_color.getGreen();
+			
+			if(current_red < list_colors[i][MIN][RED]){
+				list_colors[i][MIN][RED] = current_red;
+			}else if(list_colors[i][MAX][RED] < current_red){
+				list_colors[i][MAX][RED] = current_red;
+			}
+			
+			if(current_blue < list_colors[i][MIN][BLUE]){
+				list_colors[i][MIN][BLUE] = current_blue;
+			}else if(list_colors[i][MAX][BLUE] < current_blue){
+				list_colors[i][MAX][BLUE] = current_blue;
+			}
+			
+			if(current_green < list_colors[i][MIN][GREEN]){
+				list_colors[i][MIN][GREEN] = current_green;
+			}else if(list_colors[i][MAX][GREEN] < current_green){
+				list_colors[i][MAX][GREEN] = current_green;
+			}
+
+			color_data[RED][j] = current_red;
+			color_data[BLUE][j] = current_blue;
+			color_data[GREEN][j] = current_green;
+
+//			Delay.msDelay(50);
+		}
+
+		Arrays.sort(color_data[RED]);
+		Arrays.sort(color_data[BLUE]);
+		Arrays.sort(color_data[GREEN]);
+
+		int med_index = (nbr_tries - 1) / 2;
+		
+		list_colors[i][MED][RED] = color_data[RED][med_index];
+		list_colors[i][MED][BLUE] = color_data[BLUE][med_index];
+		list_colors[i][MED][GREEN] = color_data[GREEN][med_index];
+
+		displayFull("MAX - MIN\n R=["+list_colors[i][MIN][RED]+","+list_colors[i][MAX][RED]+"]\n B=["+list_colors[i][MIN][BLUE]+","+list_colors[i][MAX][BLUE]+"]\n G=["+list_colors[i][MIN][GREEN]+","+list_colors[i][MAX][GREEN]);
+		Button.waitForAnyPress();
+		
+		displayFull("MED\n R=["+list_colors[i][MED][RED]+"]\n B=["+list_colors[i][MED][BLUE]+"]\n G=["+list_colors[i][MED][GREEN]+"]\nPress any button to continue ...");
+		Button.waitForAnyPress();
+	}
+	
+	/**
+	 * Method that stock red, blue and green value of each color focusing on median value
+	 */
 	public void createMedOfColors(){
-		int nbr_tries = 21;
-		int[][] color_data = new int[3][nbr_tries];
-		Color in_color;
-		int current_red, current_blue, current_green;
 		Button.waitForAnyPress();
 		for(int i=0; i<nbr_colors; i++){
 			displayFull("Start stocking\nColor number "+i);
-			for(int j=0; j<nbr_tries; j++){
-				in_color = cs.getColor();
-				current_red = in_color.getRed();
-				current_blue = in_color.getBlue();
-				current_green = in_color.getGreen();
-				
-				if(current_red < list_colors[i][MIN][RED]){
-					list_colors[i][MIN][RED] = current_red;
-				}else if(list_colors[i][MAX][RED] < current_red){
-					list_colors[i][MAX][RED] = current_red;
-				}
-				
-				if(current_blue < list_colors[i][MIN][BLUE]){
-					list_colors[i][MIN][BLUE] = current_blue;
-				}else if(list_colors[i][MAX][BLUE] < current_blue){
-					list_colors[i][MAX][BLUE] = current_blue;
-				}
-				
-				if(current_green < list_colors[i][MIN][GREEN]){
-					list_colors[i][MIN][GREEN] = current_green;
-				}else if(list_colors[i][MAX][GREEN] < current_green){
-					list_colors[i][MAX][GREEN] = current_green;
-				}
-
-				color_data[RED][j] = current_red;
-				color_data[BLUE][j] = current_blue;
-				color_data[GREEN][j] = current_green;
-
-				Delay.msDelay(50);
-			}
-
-			Arrays.sort(color_data[RED]);
-			Arrays.sort(color_data[BLUE]);
-			Arrays.sort(color_data[GREEN]);
-
-			int med_index = (nbr_tries - 1) / 2;
-			
-			list_colors[i][MED][RED] = color_data[RED][med_index];
-			list_colors[i][MED][BLUE] = color_data[BLUE][med_index];
-			list_colors[i][MED][GREEN] = color_data[GREEN][med_index];
-
-			displayFull("MAX - MIN\n R=["+list_colors[i][MIN][RED]+","+list_colors[i][MAX][RED]+"]\n B=["+list_colors[i][MIN][BLUE]+","+list_colors[i][MAX][BLUE]+"]\n G=["+list_colors[i][MIN][GREEN]+","+list_colors[i][MAX][GREEN]);
-			Button.waitForAnyPress();
-			
-			displayFull("MED\n R=["+list_colors[i][MED][RED]+"]\n B=["+list_colors[i][MED][BLUE]+"]\n G=["+list_colors[i][MED][GREEN]+"]\nPress any button to stock next color ...");
-			Button.waitForAnyPress();
+			stockColor(i);
 		}
 	}
 	
@@ -194,6 +209,28 @@ public class ColorHTDetector {
 		}
 
 		return false;
+	}
+	
+
+	/**
+	 * Method to detect closest color
+	 * @param c
+	 * @return
+	 */
+	public int getCurrentColor(Color c){
+		if(testColor(c, FORWARD_COLOR)){
+			return FORWARD_COLOR;
+		}
+		
+		if(testColor(c, SPACE_COLOR)){
+			return SPACE_COLOR;
+		}
+		
+		if(testColor(c, ROTATE_COLOR)){
+			return ROTATE_COLOR;
+		}
+		
+		return SPACE_COLOR;
 	}
 	
 	/**

@@ -26,7 +26,7 @@ public class CRFMultiSensors{
 //	public static int speed_slow = 180; // 50
 //	public static int angle_plus = 8; // 
 	
-	public static int nbr_colors = 1;
+	public static int nbr_colors = 3;
 	public static int Kp = 450;
 	public static int offset = 0;
 	public static int Tp = 450;
@@ -36,6 +36,7 @@ public class CRFMultiSensors{
 	public final static int GO_FORWARD = 0;
 	public final static int ROTATE_LEFT = 1;
 	public final static int ROTATE_RIGHT = 2;
+	public final static int GO_BACK = 3;
 	
 	public static int last_rotation = ROTATE_RIGHT;
 	
@@ -55,6 +56,16 @@ public class CRFMultiSensors{
 //		System.out.println(turn);
 		Motor.A.setSpeed(Tp + turn);
 		Motor.C.setSpeed(Tp - turn);
+	}
+	
+	/**
+	 * Method to turn around 
+	 */
+	public static void goBack(){
+		Motor.A.setSpeed(-Tp);
+		Motor.C.setSpeed(-Tp);
+		Motor.A.forward();
+		Motor.C.forward();
 	}
 	
 	/**
@@ -79,6 +90,8 @@ public class CRFMultiSensors{
 		}else if((results[1] == 1) && (results[2] == 0)){
 			last_rotation = ROTATE_RIGHT;
 			return ROTATE_RIGHT;
+		}else if((results[1] == 2) || (results[2] == 2)){
+			return GO_BACK;
 		}else{
 			return last_rotation;
 		}
@@ -101,14 +114,15 @@ public class CRFMultiSensors{
 		ColorHTSensorThread  cs2Thread = new ColorHTSensorThread(cs2, results, 2, nbr_colors, colorHTDetector);
 //		LightSensorThread ls2Thread = new LightSensorThread(ls2, results, 3);
 		
-		
-		colorDetector.createMedOfColors();
-		colorHTDetector.createMedOfColors();
-		
-		
-		displayFull("On Stocking colors");
-		Button.waitForAnyPress();
-		
+		for(int i=0; i<nbr_colors; i++) {
+			displayFull("Place the robot on color number " + i + "\n Then press any button");
+			Button.waitForAnyPress();
+			displayFull("Stocking of color number " + i + " for first color detector ...");
+			colorDetector.stockColor(i);
+			Button.waitForAnyPress();
+			displayFull("Stocking of color number " + i + "for second color detector ...");
+			colorHTDetector.stockColor(i);
+		}
 
 		cs1Thread.start();
 		cs2Thread.start();
@@ -126,6 +140,19 @@ public class CRFMultiSensors{
 			}else if(getCurrentAction() == ROTATE_LEFT){
 				rotate(error);
 				System.out.println("go left");
+			}else if(getCurrentAction() == GO_BACK){
+				System.out.println("go back");
+				stopWalking();
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				/*goBack();*/
+//				while(getCurrentAction() != GO_FORWARD){};
 			}else{
 				rotate(-error);
 				System.out.println("go right");
@@ -147,7 +174,7 @@ public class CRFMultiSensors{
 	 */
 	public static void displayFull(String phrase){
 		LCD.clear();
-		LCD.drawString(phrase, 0, 0);
+		System.out.println(phrase);
 	}
 	
 	/**

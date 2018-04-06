@@ -12,6 +12,8 @@ public class ColorSensorThread extends Thread {
 	public int[] result;
 	public int id;
 	public int chosen_color = 0;
+	public int blank_color = 1;
+	public int go_back_color = 2;
 	
 	public ColorSensorThread(ColorSensor cs, int[] result, int id, int nbr_colors, ColorDetector4 colorDetector){
 		this.id = id;
@@ -44,9 +46,35 @@ public class ColorSensorThread extends Thread {
 	}
 	
 	public void run(){
+		int current_color = 0;
 		do{
-			if(/*getPickedColor(chosen_color)*/ colorDetector.testColor(cs.getColor(), chosen_color)){
+			/*if(getPickedColor(chosen_color) colorDetector.testColor(cs.getColor(), chosen_color)){
 				result[id] = 1;
+			}else if(colorDetector.testColor(cs.getColor(), blank_color)){
+				result[id] = 0;
+			}else if(colorDetector.testColor(cs.getColor(), go_back_color)){
+				result[id] = 2;
+			}else{
+				result[id] = 0;
+			}*/
+			
+			/*if(getPickedColor(chosen_color)){
+				result[id] = 1;
+			}else if(getPickedColor(blank_color)){
+				result[id] = 0;
+			}else if(getPickedColor(go_back_color)){
+				result[id] = 2;
+			}else{
+				result[id] = 0;
+			}*/
+			
+			current_color = colorDetector.getColorIndex(cs.getColor());
+			if(current_color == colorDetector.FORWARD_COLOR){
+				result[id] = 1;
+			}else if(current_color == colorDetector.SPACE_COLOR){
+				result[id] = 0;
+			}else if(current_color == colorDetector.ROTATE_COLOR){
+				result[id] = 2;
 			}else{
 				result[id] = 0;
 			}
