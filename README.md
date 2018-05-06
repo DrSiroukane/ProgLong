@@ -22,70 +22,58 @@ nxjflash
 
 Using the API documentation [click here](https://lejos.sourceforge.io/nxt/nxj/api/index.html) and other sources like this [tutorial](http://www.lejos.org/nxt/nxj/tutorial/).
 
-## Step 3: Deferences Programmes
-
-### HelloWorld.java
-
-A programme that display Hello World.
-
-### WalkingRobot.java
-
-A program that makes a robot walk depend on pressed button. Using a classes :
-	[LCD](http://www.lejos.org/nxt/nxj/api/lejos/nxt/LCD.html), 
-	[Button](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Button.html), 
-	[Motor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Motor.html), 
-	[Delay](http://www.lejos.org/nxt/nxj/api/lejos/util/Delay.html).
-
-### WalkingRobot2.java
-
-A program that makes a robot walk depend on pressed button. Using a classes :
-	[LCD](http://www.lejos.org/nxt/nxj/api/lejos/nxt/LCD.html), 
-	[Button](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Button.html), 
-	[Motor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Motor.html).
-
-
-### ColorDetector.java
-
-A program that makes a robot learn about colors then detect them, 
-using min and max for each color (RGB) if detected color inside the interval
-else try to find which stocked color is the closest using also min and max.
-	[SensorPort](http://www.lejos.org/nxt/nxj/api/lejos/nxt/SensorPort.html)
-	[ColorSensor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/ColorSensor.html),
-	[Color](http://www.lejos.org/nxt/pc/api/lejos/robotics/Color.html).
-
-
-### ColorDetector2.java
-
-A program that makes a robot learn about colors then detect them, 
-using min and max for each color (RGB) if detected color inside the interval
-else try to find which stocked color is the closest using the median.
-	[SensorPort](http://www.lejos.org/nxt/nxj/api/lejos/nxt/SensorPort.html)
-	[ColorSensor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/ColorSensor.html),
-	[Color](http://www.lejos.org/nxt/pc/api/lejos/robotics/Color.html).
-
-### ColorDetector3.java
-
-A program that makes a robot learn about colors then detect them, 
-using color (RGB) to find which stocked color is the closest to color median.
-
-### ColorDetector4.java
-
-A program that makes a robot learn about colors then detect them, 
-using min and max for each color (RGB) if detected color inside the interval
-else try to find which stocked color is the closest using the median,
-else try to find if its cloest to min and max using distance 
+## Step 3: Differences Programmes
 
 ### CLineFollower.java
+text
 
-A program that makes a robot follow specified line by its color,
-	[ColorDetector3](),
-	[DifferentialPilot](https://lejos.sourceforge.io/nxt/nxj/api/lejos/robotics/navigation/DifferentialPilot.html),
-	and other classes.
+### ColorDetectorMain.java
+text
 
 ### CRoadFollower.java
+text
 
-### CRoadFollower2.java
+### WalkingRobot.java
+text
 
+### OneSensorAlg.java
+text
+
+### TwoSensorAlg.java
+text
+
+## Step 4: Needed Classes
+text
+
+### ColorDetector.java
+text
+
+### ColorHTDetector.java
+text
+
+### Messages.java
+text
+
+## Step 5: Manual compilation
+
+Complation steps: 
+
+1. Open "Terminal" of "Cmd",
+
+2. Go to class *.java folder,
+
+3. Compile "class_name.java" using this command,
+    ```
+    nxjc class_name.java
+    ```
+4. "class_name.class" output will be created,
+    
+5. Be sure that the robot is connected (USB),
+
+6. Do the command below to run the program on the robot,
+```
+nxjc -r class_name
+```
 
 ## Created by
 
