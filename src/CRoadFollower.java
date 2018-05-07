@@ -1,4 +1,6 @@
-import lejos.nxt.*;
+import lejos.nxt.Button;
+import lejos.nxt.ColorSensor;
+import lejos.nxt.SensorPort;
 
 /**
  * @author Slimane SIROUKANE
@@ -10,58 +12,7 @@ public class CRoadFollower {
     public static ColorSensor cs;
     public static ColorDetector cd;
 
-    public static int Kp = 400;
-    public static int offset = 0;
-    public static int Tp = 400;
-    public static int turn = 0;
     public static double error = 0.4;
-    public static double init_error = 0.25;
-    public static double step_error = 0.05;
-
-    /**
-     * Make a robot walk forward
-     */
-    public static void walkForward() {
-        Motor.A.setSpeed(Tp);
-        Motor.C.setSpeed(Tp);
-        Motor.A.forward();
-        Motor.C.forward();
-    }
-
-    public static void rotate(double error) {
-        turn = (int) (Kp * error);
-        System.out.println(turn);
-        Motor.A.setSpeed(Tp + turn);
-        Motor.C.setSpeed(Tp - turn);
-    }
-
-    /**
-     * Rotate Right
-     *
-     * @param i
-     */
-	/*public static void rotateRight(int i){
-		Motor.A.setSpeed(speed_fast + (angle_plus * i));
-		Motor.C.setSpeed(speed_slow);
-	}
-	
-	*//**
-     * Rotate Left
-     *
-     * @param i
-     *//*
-	public static void rotateLeft(int i){
-		Motor.A.setSpeed(speed_slow);
-		Motor.C.setSpeed(speed_fast + (angle_plus * i));
-	}*/
-
-    /**
-     * Make a robot stop walking
-     */
-    public static void stopWalking() {
-        Motor.A.stop();
-        Motor.C.stop();
-    }
 
     /**
      * Pick color
@@ -81,7 +32,7 @@ public class CRoadFollower {
     }
 
     public static void main(String[] args) {
-        displayFull("Start program ...\nPress any key ...");
+        System.out.println("Start program ...\nPress any key ...");
         Button.waitForAnyPress();
         /**
          * Enter number of colors
@@ -95,7 +46,7 @@ public class CRoadFollower {
          */
         int chosen_color = 0;
         //int stop_color = 1;
-        displayFull("Chosen color " + chosen_color + "\nPut the robot in \na right color to \nfollow the line");
+        System.out.println("Chosen color " + chosen_color + "\nPut the robot in \na right color to \nfollow the line");
         Button.waitForAnyPress();
 
         /**
@@ -103,19 +54,14 @@ public class CRoadFollower {
          */
         int count_right = 1;
         int count_left = 1;
-        displayFull("Start following\nthe line ...");
-        walkForward();
+        System.out.println("Start following\nthe line ...");
+        OneSensorAlg.walkForward();
 
         boolean right_color = false;
 
         do {
-			/*
-			if(getPickedColor(stop_color)){ // stop color found
-				break;
-			}
-		*/
             while (getPickedColor(chosen_color)) { // walking color found
-                rotate(error);
+                OneSensorAlg.rotate(error);
                 right_color = false;
             }
 
@@ -124,34 +70,14 @@ public class CRoadFollower {
             }
 
             while (!getPickedColor(chosen_color)) { // trying to find walking color
-                rotate(error * 2.2);
+                OneSensorAlg.rotate(error * 2.2);
                 right_color = true;
             }
 
         } while (!Button.ESCAPE.isDown());
 
-        stopWalking();
-        displayFull("Program end ...");
+        OneSensorAlg.stopWalking();
+        System.out.println("Program end ...");
         Button.waitForAnyPress();
-    }
-
-
-    /**
-     * Display only the phrase on screen
-     *
-     * @param phrase
-     */
-    public static void displayFull(String phrase) {
-        LCD.clear();
-        LCD.drawString(phrase, 0, 0);
-    }
-
-    /**
-     * Add phrase to display
-     *
-     * @param phrase
-     */
-    public static void println(String phrase) {
-        System.out.println(phrase);
     }
 }

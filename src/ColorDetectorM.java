@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * <p> A program that makes a robot learn about colors then detect them </p>
  */
-abstract class ColorDetectorMain {
+public abstract class ColorDetectorM {
     public final int RED = 0;
     public final int BLUE = 1;
     public final int GREEN = 2;
@@ -30,11 +30,12 @@ abstract class ColorDetectorMain {
 
     public static final int FOLLOW_LINE_MODE = 0;
     public static final int DETECT_COLOR_MODE = 1;
+    public static final int DEVELOPER_MODE = 2;
 
     public int[] errors = {15, 15};
     public int mode = FOLLOW_LINE_MODE;
 
-    public int nbr_colors;
+    public int nbr_colors = 2;
     public int[][][] list_colors = {
             {
                     {500, 500, 500}, // MIN
@@ -97,13 +98,15 @@ abstract class ColorDetectorMain {
         list_colors[i][MED][RED] = color_data[RED][med_index];
         list_colors[i][MED][BLUE] = color_data[BLUE][med_index];
         list_colors[i][MED][GREEN] = color_data[GREEN][med_index];
+        if (mode == DEVELOPER_MODE) {
+            System.out.println("MAX - MIN\n R=[" + list_colors[i][MIN][RED] + "," + list_colors[i][MAX][RED] + "]\n B=[" + list_colors[i][MIN][BLUE] + "," + list_colors[i][MAX][BLUE] + "]\n G=[" + list_colors[i][MIN][GREEN] + "," + list_colors[i][MAX][GREEN]);
+            System.out.println();
+            Button.waitForAnyPress();
 
-        System.out.println("MAX - MIN\n R=[" + list_colors[i][MIN][RED] + "," + list_colors[i][MAX][RED] + "]\n B=[" + list_colors[i][MIN][BLUE] + "," + list_colors[i][MAX][BLUE] + "]\n G=[" + list_colors[i][MIN][GREEN] + "," + list_colors[i][MAX][GREEN]);
-        System.out.println();
-        Button.waitForAnyPress();
-
-        System.out.println("MED\n R=[" + list_colors[i][MED][RED] + "]\n B=[" + list_colors[i][MED][BLUE] + "]\n G=[" + list_colors[i][MED][GREEN] + "]\nPress any button to continue ...");
-        System.out.println();
+            System.out.println("MED\n R=[" + list_colors[i][MED][RED] + "]\n B=[" + list_colors[i][MED][BLUE] + "]\n G=[" + list_colors[i][MED][GREEN] + "]\nPress any button to continue ...");
+            System.out.println();
+            Button.waitForAnyPress();
+        }
         Button.waitForAnyPress();
     }
 
@@ -176,12 +179,16 @@ abstract class ColorDetectorMain {
      *
      * @param c            Color
      * @param color_number index of color to test with c
-     * @return check weather the color can be the same of color_number
+     * @return check whether the color can be the same of color_number
      */
     public boolean testColor(Color c, int color_number) {
-        System.out.println("color_number: " + color_number);
-        System.out.println("d(MinMax):" + minDistance3D(c, color_number, MIN));
-        System.out.println("d(Med):" + minDistance3D(c, color_number, MED));
+        if (mode == DEVELOPER_MODE) {
+            System.out.println("color_number: " + color_number);
+            System.out.println("d(MinMax):" + minDistance3D(c, color_number, MIN));
+            System.out.println("d(Med):" + minDistance3D(c, color_number, MED));
+            Button.waitForAnyPress();
+        }
+
         return (
                 (testColorMinMax(c, color_number)) ||
                         (minDistance3D(c, color_number, MED) < errors[color_number]) ||
@@ -193,7 +200,7 @@ abstract class ColorDetectorMain {
      * Test Color MIN MAX
      *
      * @param c Color
-     * @return check weather the color in the interval or not
+     * @return check whether the color in the interval or not
      */
     public boolean testColorMinMax(Color c, int color_number) {
         if (list_colors[color_number][MIN][RED] <= c.getRed() && c.getRed() <= list_colors[color_number][MAX][RED]) {
@@ -203,7 +210,6 @@ abstract class ColorDetectorMain {
                 }
             }
         }
-
         return false;
     }
 
@@ -249,12 +255,12 @@ abstract class ColorDetectorMain {
             }
         }
 
-        if(mode == DETECT_COLOR_MODE){
-            for(int i=0; i<nbr_colors; i++){ // check value between min and max
-                color_detected[i][2] = testColorMinMax(c, i) ? 1 : 0;
-            }
+        for (int i = 0; i < nbr_colors; i++) { // check value between min and max
+            color_detected[i][2] = testColorMinMax(c, i) ? 1 : 0;
+        }
 
-            for(int i=0; i<color_detected.length; i++){
+        if (mode == DEVELOPER_MODE) {
+            for (int i = 0; i < color_detected.length; i++) {
                 System.out.println("color " + i + ": ");
 
                 System.out.println("MMD : " + color_detected[i][0]);
@@ -266,7 +272,7 @@ abstract class ColorDetectorMain {
             }
 
             Button.waitForAnyPress();
-            for(int i=0; i<dists.length; i++){
+            for (int i = 0; i < dists.length; i++) {
                 System.out.println("color " + i + ": ");
 
                 System.out.println("MMD : " + dists[i][0]);
@@ -278,13 +284,8 @@ abstract class ColorDetectorMain {
         }
 
         dists_test = dists;
-
         for (int i = 0; i < color_detected.length; i++) {
             if ((color_detected[i][0] == 1) || (color_detected[i][1] == 1)) {
-                if(mode == DETECT_COLOR_MODE){
-                    Messages.printScreen(Messages.STOCK_COLOR_SCREEN, Messages.DETECTOR_COLOR_0);
-                }
-
                 return i;
             }
         }
@@ -296,37 +297,23 @@ abstract class ColorDetectorMain {
         return null;
     }
 
-    public void config(int colorType, int mode){
+    public void config(int colorType, int mode) {
         return;
     }
 
     public static void main(String[] args) {
-        int nbr_color = 2;
-        int chosen_sensor = 0;
-        String[] sensors = {"colorSensor", "colorHTSenser"};
-        int chosen_port = 0;
-        String[] ports = {"S2", "S3"};
-        SensorPort[] sensorPorts = {SensorPort.S2, SensorPort.S3};
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.START_PROGRAM);
+        Button.waitForAnyPress();
+
+        int nbr_colors = 2;
+        SensorPort[] sensorPorts = {SensorPort.S1, SensorPort.S2, SensorPort.S3, SensorPort.S4};
         ColorSensor colorSensor = null;
         ColorHTSensor colorHTSensor = null;
-        ColorDetectorMain colorDetector;
-        do {
-            System.out.println("Choosen senser type : " + sensors[chosen_sensor]);
-            System.out.println();
-            Button.waitForAnyPress();
-            if (Button.LEFT.isDown() || Button.RIGHT.isDown()) {
-                chosen_sensor = (chosen_sensor == 0) ? 1 : 0;
-            }
-        } while (!Button.ENTER.isDown());
+        ColorDetectorM colorDetector;
 
-        do {
-            System.out.println("Choosen port : " + ports[chosen_port]);
-            System.out.println();
-            Button.waitForAnyPress();
-            if (Button.LEFT.isDown() || Button.RIGHT.isDown()) {
-                chosen_port = (chosen_port == 0) ? 1 : 0;
-            }
-        } while (!Button.ENTER.isDown());
+        int chosen_sensor = chooseSensorScreen();
+        int chosen_port = choosePortScreen();
+        int chosen_color_nature = chooseColorNatureScreen();
 
         if (chosen_sensor == 0) {
             colorSensor = new ColorSensor(sensorPorts[chosen_port]);
@@ -335,26 +322,84 @@ abstract class ColorDetectorMain {
         }
 
         colorDetector = (chosen_sensor == 0) ?
-                new ColorDetector(nbr_color, colorSensor) :
-                new ColorHTDetector(nbr_color, colorHTSensor);
+                new ColorDetector(nbr_colors, colorSensor) :
+                new ColorHTDetector(nbr_colors, colorHTSensor);
 
-        System.out.println("Stock color using Color Sensor detector");
-        System.out.println();
+        colorDetector.config(chosen_color_nature, ColorDetectorM.DETECT_COLOR_MODE);
+
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.BEGIN_STOCK_COLORS);
         Button.waitForAnyPress();
 
-        colorDetector.createMedOfColors();
+        for (int i = 0; i < 2; i++) {
+            stockColorScreen(i, 1, colorDetector);
+        }
 
-        System.out.println("Start testing");
-        System.out.println();
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.BEGIN_DETECT_COLORS);
         Button.waitForAnyPress();
 
         int current_color = 0;
         do {
             current_color = colorDetector.getCurrentColor();
             Button.waitForAnyPress();
-            System.out.println("Current color detected " + current_color);
-            System.out.println();
+            Messages.printScreen(Messages.DETECTED_COLOR_SCREEN, current_color);
             Button.waitForAnyPress();
         } while (!Button.ESCAPE.isDown());
+
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.END_PROGRAM);
+        Button.waitForAnyPress();
+    }
+
+    public static int chooseSensorScreen() {
+        int chosen_sensor = 0;
+        do { // chose sensor type
+            Messages.printScreen(Messages.CHOOSE_SENSOR_TYPE_SCREEN, chosen_sensor);
+            Button.waitForAnyPress();
+            if (Button.LEFT.isDown() || Button.RIGHT.isDown()) {
+                chosen_sensor = (chosen_sensor == 0) ? 1 : 0;
+            }
+        } while (!Button.ENTER.isDown());
+        return chosen_sensor;
+    }
+
+    public static int choosePortScreen() {
+        int chosen_port = 0;
+        do { // chose sensor port
+            Messages.printScreen(Messages.CHOOSE_SENSOR_PORT_SCREEN, (chosen_port + 1));
+            Button.waitForAnyPress();
+            if (Button.RIGHT.isDown()) {
+                chosen_port = (chosen_port + 1) % 4;
+            } else if (Button.LEFT.isDown()) {
+                chosen_port = (chosen_port == 0) ? 3 : (chosen_port - 1);
+            }
+        } while (!Button.ENTER.isDown());
+        return chosen_port;
+    }
+
+    public static int chooseColorNatureScreen() {
+        int chosen_color_nature = 0;
+        do { // chose color nature
+            Messages.printScreen(Messages.CHOOSE_COLOR_NATURE_SCREEN, chosen_color_nature);
+            Button.waitForAnyPress();
+            if (Button.LEFT.isDown() || Button.RIGHT.isDown()) {
+                chosen_color_nature = (chosen_color_nature == 0) ? 1 : 0;
+            }
+        } while (!Button.ENTER.isDown());
+        return chosen_color_nature;
+    }
+
+    public static void stockColorScreen(int color, int detector, ColorDetectorM colorDetector) {
+        Messages.color = color;
+        Messages.detector = detector;
+        Messages.printScreen(Messages.STOCK_COLOR_SCREEN,
+                (color == 0) ? Messages.PUT_ON_COLOR_0 : Messages.PUT_ON_COLOR_1);
+        Button.waitForAnyPress();
+        Messages.printScreen(Messages.STOCK_COLOR_SCREEN,
+                (detector == 1) ? Messages.DETECTOR_COLOR_0 : Messages.DETECTOR_COLOR_1);
+        Button.waitForAnyPress();
+        Messages.printScreen(Messages.STOCK_COLOR_SCREEN,
+                (color == 0) ? Messages.STOCK_COLOR_0 : Messages.STOCK_COLOR_1);
+        colorDetector.stockColor(color);
+        Messages.printScreen(Messages.STOCK_COLOR_SCREEN, Messages.FINISH_STOCK_COLOR);
+        Button.waitForAnyPress();
     }
 }

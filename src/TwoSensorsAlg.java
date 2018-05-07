@@ -1,9 +1,8 @@
 import lejos.nxt.Button;
 import lejos.nxt.ColorSensor;
-import lejos.nxt.Motor;
+import lejos.nxt.LCD;
 import lejos.nxt.SensorPort;
 import lejos.nxt.addon.ColorHTSensor;
-import lejos.robotics.navigation.DifferentialPilot;
 
 /**
  * @author Slimane SIROUKANE
@@ -15,21 +14,12 @@ import lejos.robotics.navigation.DifferentialPilot;
  * and return back when it detect (color 2) or stop
  * </p>
  */
-public class TwoSensorsAlg {
-    public static final int BACK_CAMMAND = 0;
-    public static final int STOP_CAMMAND = 1;
-
+public class TwoSensorsAlg extends OneSensorAlg {
     public static ColorSensor colorSensor; // first sensor
     public static ColorHTSensor colorHTSensor; // second sensor
-    public static ColorDetectorMain[] colorDetectors; // color detectors
+    public static ColorDetectorM[] colorDetectors; // color detectors
     public static ColorDetectorThread[] colorDetectorThreads; // color detector threads
     public static volatile int[] results = {0, 0};
-
-    public static int nbr_colors = 2;
-    public static int Kp = 400; // rotate speed
-    public static int Tp = 350; // forward speed
-    public static int turn = 0;
-    public static double error = 0.5;
 
     public final static int GO_FORWARD = 0;
     public final static int ROTATE_LEFT = 1;
@@ -37,53 +27,7 @@ public class TwoSensorsAlg {
     public final static int GO_BACK = 3;
 
     public static int last_rotation = ROTATE_RIGHT;
-
     public static boolean go_back = false;
-    public static boolean go_back_exec = false;
-    public static int goBackCommand = 0;
-
-    /**
-     * Make a robot walk forward
-     */
-    public static void walkForward() {
-        Motor.A.setSpeed(Tp);
-        Motor.C.setSpeed(Tp);
-        Motor.A.forward();
-        Motor.C.forward();
-    }
-
-    /**
-     * Make a robot turn right or left depend error value
-     *
-     * @param error
-     */
-    public static void rotate(double error) {
-        turn = (int) (Kp * error);
-        Motor.A.setSpeed(Tp + turn);
-        Motor.C.setSpeed(Tp - turn);
-        Motor.A.forward();
-        Motor.C.forward();
-    }
-
-    /**
-     * Make a robot turn back
-     */
-    public static void goBack() {
-        if (!go_back_exec) {
-            DifferentialPilot pilot = new DifferentialPilot(1f, 5.12f, Motor.A, Motor.C);
-            pilot.setTravelSpeed(1);
-            pilot.rotate(80);
-            go_back_exec = true;
-        }
-    }
-
-    /**
-     * Make a robot stop walking
-     */
-    public static void stopWalking() {
-        Motor.A.stop();
-        Motor.C.stop();
-    }
 
     /**
      * Get current action (ROATATE_LEFT, ROTATE_RIGHT, ...) depend on sensors result
@@ -119,84 +63,70 @@ public class TwoSensorsAlg {
     }
 
     public static void main(String[] args) {
-        System.out.println("Start program ...\nPress any key ...");
-        System.out.println();
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.START_PROGRAM);
         Button.waitForAnyPress();
+
+        int chosen_color_nature = ColorDetectorM.chooseColorNatureScreen();
 
         colorSensor = new ColorSensor(SensorPort.S2);
         colorHTSensor = new ColorHTSensor(SensorPort.S3);
 
-        colorDetectors = new ColorDetectorMain[2];
+        colorDetectors = new ColorDetectorM[2];
         colorDetectors[0] = new ColorHTDetector(nbr_colors, colorHTSensor);
         colorDetectors[1] = new ColorDetector(nbr_colors, colorSensor);
+
+        colorDetectors[0].config(chosen_color_nature, ColorDetectorM.FOLLOW_LINE_MODE);
+        colorDetectors[1].config(chosen_color_nature, ColorDetectorM.FOLLOW_LINE_MODE);
 
         colorDetectorThreads = new ColorDetectorThread[2];
         colorDetectorThreads[0] = new ColorDetectorThread(results, 0, colorDetectors[0]);
         colorDetectorThreads[1] = new ColorDetectorThread(results, 1, colorDetectors[1]);
 
-        for (int i = 0; i < nbr_colors; i++) {
-            System.out.println("Place the robot on color number " + (i + 1) + "\n----\nThen press any button");
-            System.out.println();
-            Button.waitForAnyPress();
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.BEGIN_STOCK_COLORS);
+        Button.waitForAnyPress();
 
+        for (int i = 0; i < nbr_colors; i++) {
             for (int j = 0; j < colorDetectors.length; j++) {
-                System.out.println("Stocking color number " + (i + 1) + "\nfor color detector (" + (j + 1) + ")");
-                System.out.println();
-                Button.waitForAnyPress();
-                colorDetectors[j].stockColor(i);
+                ColorDetectorM.stockColorScreen(i, j, colorDetectors[j]);
             }
         }
 
-        do {
-            System.out.println("Choosen command is : " + ((goBackCommand == BACK_CAMMAND) ? "go back" : "stop"));
-            System.out.println();
-
-            Button.waitForAnyPress();
-            if (Button.LEFT.isDown() || Button.RIGHT.isDown()) {
-                goBackCommand = (goBackCommand == BACK_CAMMAND) ? STOP_CAMMAND : BACK_CAMMAND;
-            }
-        } while (!Button.ENTER.isDown());
+        chooseCommandScreen();
 
         colorDetectorThreads[0].start();
         colorDetectorThreads[1].start();
 
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.READY_TO_FOLLOW_LINE);
+        Button.waitForAnyPress();
+        walkForward();
+        Messages.newScreen();
         do {
-            System.out.println("Start following\nthe line ...");
-            System.out.println();
-            Button.waitForAnyPress();
-            walkForward();
-            do {
-                if (getCurrentAction() == GO_FORWARD) {
-                    walkForward();
-                    System.out.println("go forward");
-                } else if (getCurrentAction() == ROTATE_LEFT) {
-                    rotate(error);
-                    System.out.println("go left");
-                } else if (getCurrentAction() == ROTATE_RIGHT) {
-                    rotate(-error);
-                    System.out.println("go right");
-                } else if (getCurrentAction() == GO_BACK) {
-                    System.out.println("go back");
-                    if (goBackCommand == BACK_CAMMAND) {
-                        goBack();
-                    } else {
-                        break;
-                    }
+            if (getCurrentAction() == GO_FORWARD) {
+                walkForward();
+                LCD.drawString("go forward", 3, 3);
+            } else if (getCurrentAction() == ROTATE_LEFT) {
+                rotate(error);
+                LCD.drawString(" go left  ", 3, 3);
+            } else if (getCurrentAction() == ROTATE_RIGHT) {
+                rotate(-error);
+                LCD.drawString(" go right ", 3, 3);
+            } else if (getCurrentAction() == GO_BACK) {
+                LCD.drawString(" go back  ", 3, 3);
+                if (goBackCommand == BACK_CAMMAND) {
+                    goBack();
                 } else {
-                    rotate(-error);
-                    System.out.println("go right");
+                    break;
                 }
-                System.out.println("l(" + results[1] + "), r(" + results[2] + ")");
-            } while (!Button.ESCAPE.isDown());
-            stopWalking();
-            colorDetectorThreads[0].interrupt();
-            colorDetectorThreads[1].interrupt();
-            System.out.println("Press ESCAPE to leave program");
-            System.out.println();
-            Button.waitForAnyPress();
+            } else {
+                rotate(-error);
+                LCD.drawString(" go back  ", 3, 3);
+            }
         } while (!Button.ESCAPE.isDown());
+        stopWalking();
+        colorDetectorThreads[0].interrupt();
+        colorDetectorThreads[1].interrupt();
 
-        System.out.println("Press ESCAPE to end program ...");
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.END_PROGRAM);
         System.out.println();
         Button.waitForAnyPress();
     }

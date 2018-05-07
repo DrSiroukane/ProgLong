@@ -1,6 +1,4 @@
-import lejos.nxt.Button;
-import lejos.nxt.Motor;
-import lejos.nxt.SensorPort;
+import lejos.nxt.*;
 import lejos.nxt.addon.ColorHTSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 
@@ -17,9 +15,6 @@ import lejos.robotics.navigation.DifferentialPilot;
 public class OneSensorAlg {
     public static final int BACK_CAMMAND = 0;
     public static final int STOP_CAMMAND = 1;
-
-    public static ColorHTSensor colorHTSensor;
-    public static ColorHTDetector colorHTDetector;
 
     public static int nbr_colors = 2;
     public static int Kp = 400;
@@ -76,38 +71,44 @@ public class OneSensorAlg {
         Messages.printScreen(Messages.HELLO_SCREEN, Messages.START_PROGRAM);
         Button.waitForAnyPress();
 
-        colorHTSensor = new ColorHTSensor(SensorPort.S3);
-        colorHTDetector = new ColorHTDetector(nbr_colors, colorHTSensor);
+        SensorPort[] sensorPorts = {SensorPort.S1, SensorPort.S2, SensorPort.S3, SensorPort.S4};
+        ColorSensor colorSensor = null;
+        ColorHTSensor colorHTSensor = null;
+        ColorDetectorM colorDetector;
 
-        for (int i = 0; i < nbr_colors; i++) {
-            Messages.printScreen(Messages.STOCK_COLOR_SCREEN,
-                    (i == 0) ? Messages.PUT_ON_COLOR_0 : Messages.PUT_ON_COLOR_1);
-            Button.waitForAnyPress();
-            Messages.printScreen(Messages.STOCK_COLOR_SCREEN,
-                    (i == 0) ? Messages.STOCK_COLOR_0 : Messages.STOCK_COLOR_1);
-            Messages.printScreen(Messages.STOCK_COLOR_SCREEN, Messages.DETECTOR_COLOR_0);
-            colorHTDetector.stockColor(i);
-            Messages.printScreen(Messages.STOCK_COLOR_SCREEN, Messages.FINISH_STOCK_COLOR);
+        int chosen_sensor = ColorDetectorM.chooseSensorScreen();
+        int chosen_port = ColorDetectorM.choosePortScreen();
+        int chosen_color_nature = ColorDetectorM.chooseColorNatureScreen();
+
+        if (chosen_sensor == 0) {
+            colorSensor = new ColorSensor(sensorPorts[chosen_port]);
+        } else {
+            colorHTSensor = new ColorHTSensor(sensorPorts[chosen_port]);
         }
 
-        do {
-            Messages.printScreen(Messages.BACK_COMMAND_SCREEN,
-                    (goBackCommand == BACK_CAMMAND) ? Messages.GO_BACK : Messages.STOP_WALK);
-            Button.waitForAnyPress();
-            if (Button.LEFT.isDown() || Button.RIGHT.isDown()) {
-                goBackCommand = (goBackCommand == BACK_CAMMAND) ? STOP_CAMMAND : BACK_CAMMAND;
-            }
-        } while (!Button.ENTER.isDown());
+        colorDetector = (chosen_sensor == 0) ?
+                new ColorDetector(nbr_colors, colorSensor) :
+                new ColorHTDetector(nbr_colors, colorHTSensor);
 
-        do {
-            System.out.println("Start following\nthe line ...");
-            System.out.println();
-            Button.waitForAnyPress();
-            walkForward();
+        colorDetector.config(chosen_color_nature, ColorDetectorM.DETECT_COLOR_MODE);
 
-            int result = colorHTDetector.getCurrentColor();
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.BEGIN_STOCK_COLORS);
+        Button.waitForAnyPress();
+
+        for (int i = 0; i < 2; i++) {
+            ColorDetectorM.stockColorScreen(i, 1, colorDetector);
+        }
+
+        chooseCommandScreen();
+
+        Messages.printScreen(Messages.HELLO_SCREEN, Messages.READY_TO_FOLLOW_LINE);
+        Button.waitForAnyPress();
+        walkForward();
+        Messages.newScreen();
+        do {
+            int result = colorDetector.getCurrentColor();
             if (result == 1) {
-                System.out.println("go back");
+                LCD.drawString("go back ", 3, 3);
                 if (goBackCommand == BACK_CAMMAND) {
                     goBack();
                 } else {
@@ -119,13 +120,10 @@ public class OneSensorAlg {
                 }
                 if (result == 0) {
                     rotate(error);
-                    System.out.println("go left");
-                } else if (result == 2) {
-                    rotate(-error);
-                    System.out.println("go right");
+                    LCD.drawString("go left ", 3, 3);
                 } else {
                     rotate(-error);
-                    System.out.println("go right");
+                    LCD.drawString("go right", 3, 3);
                 }
             }
         } while (!Button.ESCAPE.isDown());
@@ -134,5 +132,16 @@ public class OneSensorAlg {
         Messages.printScreen(Messages.HELLO_SCREEN, Messages.END_PROGRAM);
         System.out.println();
         Button.waitForAnyPress();
+    }
+
+    public static void chooseCommandScreen() {
+        do {
+            Messages.printScreen(Messages.BACK_COMMAND_SCREEN,
+                    (goBackCommand == BACK_CAMMAND) ? Messages.GO_BACK : Messages.STOP_WALK);
+            Button.waitForAnyPress();
+            if (Button.LEFT.isDown() || Button.RIGHT.isDown()) {
+                goBackCommand = (goBackCommand == BACK_CAMMAND) ? STOP_CAMMAND : BACK_CAMMAND;
+            }
+        } while (!Button.ENTER.isDown());
     }
 }

@@ -7,7 +7,7 @@ import lejos.robotics.Color;
  *
  * <p> A program that makes a robot learn about colors then detect them for ColorHTSensor </p>
  */
-public class ColorHTDetector extends ColorDetectorMain {
+public class ColorHTDetector extends ColorDetectorM {
     public ColorHTSensor cs;
 
     public ColorHTDetector(int nbr_colors, ColorHTSensor cs) {
@@ -22,10 +22,10 @@ public class ColorHTDetector extends ColorDetectorMain {
 
     @Override
     public void config(int colorType, int mode) {
-        if(colorType == DARK_COLOR){
+        if (colorType == DARK_COLOR) {
             errors[0] = 10;
             errors[1] = 10;
-        }else{
+        } else {
             errors[0] = 15;
             errors[1] = 15;
         }
