@@ -17,46 +17,65 @@ Update the firmware of NXT using the command
 nxjflash
 ```
 
-
 ## Step 2: Programming
 
-Using the API documentation [click here](https://lejos.sourceforge.io/nxt/nxj/api/index.html) and other sources like this [tutorial](http://www.lejos.org/nxt/nxj/tutorial/).
+Using the API documentation [click here](https://lejos.sourceforge.io/nxt/nxj/api/index.html) 
+and other sources like this [tutorial](http://www.lejos.org/nxt/nxj/tutorial/).
 
 ## Step 3: Differences Programmes
+	
+### ColorDetectorM.java
+A program that makes a robot learn about colors then detect them,
+Methods used:
+* Pick min and max for each color (RGB) if detected color inside the interval
+* Try to find which stocked color is the closest using the median,
+* Try to find if its closest to min and max using distance.
 
-### CLineFollower.java
-text
-
-### ColorDetectorMain.java
-text
-
-### CRoadFollower.java
-text
+<b>Note:</b> distance = Math.sqrt((R - R')² + (G - G')² +(B - B')²)
 
 ### WalkingRobot.java
-text
+A program that makes a robot walk depend on pressed button. Using a classes :
+	[LCD](http://www.lejos.org/nxt/nxj/api/lejos/nxt/LCD.html), 
+	[Button](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Button.html), 
+	[Motor](http://www.lejos.org/nxt/nxj/api/lejos/nxt/Motor.html).
+
+### CLineFollower.java
+A program that makes a robot follow stright  line by its color,
+	[ColorDetector](),
+	[DifferentialPilot](https://lejos.sourceforge.io/nxt/nxj/api/lejos/robotics/navigation/DifferentialPilot.html),
+and other classes.
+
+### CRoadFollower.java
+A program that makes a robot follow specified road by its color with only one sensor.
+The method was letting robot get out from the road color and change direction each time it get out 
+from line going right, left.
 
 ### OneSensorAlg.java
-text
+A final program that makes a robot follow specified line (color 1)
+and return back when it detect (color 2) or stop.
 
 ### TwoSensorAlg.java
-text
+The same as previews program but with two sensors.
 
 ## Step 4: Needed Classes
-text
+Helpful classes.
 
 ### ColorDetector.java
-text
+Class that extends [ColorDetectorM.java]() to be used only for normal Color Sensor.
 
 ### ColorHTDetector.java
-text
+Class that extends [ColorDetectorM.java]() to be used only for HT Color Sensor.
+
+### ColorDetectorThread.java
+Thread that help to stock the detected color index with help of Color Detector 
+class.
 
 ### Messages.java
-text
+Class that generate a great messages and menu to make the programs easy to use.
 
 ## Step 5: Manual compilation
 
-Complation steps: 
+Compilation steps: 
 
 1. Open "Terminal" of "Cmd",
 

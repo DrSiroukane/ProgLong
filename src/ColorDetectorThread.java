@@ -4,7 +4,7 @@ import lejos.nxt.Button;
  * @author Slimane SIROUKANE
  * @author Thomas GUIGNARD
  *
- * <p> thread help to detect color and stock it F </p>
+ * <p> thread help to detect color and stock its result </p>
  */
 public class ColorDetectorThread extends Thread {
     public ColorDetectorM colorDetector;
